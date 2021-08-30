@@ -155,13 +155,14 @@ function App() {
       auth.getContent(jwt)
         .then((res) => {
           if (res) {
+            setIsLoggedIn(true);
+            history.push('/');
             setEmailValue(res.data.email);
           }
-          setIsLoggedIn(true);
-          history.push('/');
         })
         .catch((err) => {
           console.log(err);
+          localStorage.removeItem('jwt');
         });
     }
   }, [isLoggedIn, history]);
@@ -174,7 +175,6 @@ function App() {
           text: 'Вы успешно зарегистрировались!',
         });
         handleInfoTooltipOpen();
-        setTimeout(history.push, 2000, "/sign-in");
       })
       .catch(() => {
         changeInfoTooltip({
@@ -184,17 +184,21 @@ function App() {
       })
       .finally(() => {
         handleInfoTooltipOpen();
-        setTimeout(closeAllPopups, 3000);
       });
   }
 
   function authorization(email, password) {
     auth.authorize(email, password)
-    if (email !== emailValue) {
-      setEmailValue(email);
-    }
-    setIsLoggedIn(true);
-    history.push('/');
+      .then((data) => {
+        if (data.token) {
+          setIsLoggedIn(true);
+          history.push('/');
+          setEmailValue(email);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   function signOut() {
