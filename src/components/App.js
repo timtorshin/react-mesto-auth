@@ -191,6 +191,7 @@ function App() {
     auth.authorize(email, password)
       .then((data) => {
         if (data.token) {
+          localStorage.setItem('jwt', data.token);
           setIsLoggedIn(true);
           history.push('/');
           setEmailValue(email);
